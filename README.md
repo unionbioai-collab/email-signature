@@ -14,8 +14,8 @@ GitHub Pages용 정적 이메일 서명 생성기. 서버 불필요.
 ## 배포
 1. 이 폴더 전체를 리포지토리에 업로드 (Public)
 2. Settings → Pages → Source: Deploy from a branch / Branch: main / (root) → Save
-3. 직원 공유 주소: `https://<계정>.github.io/<리포명>/`
-4. 관리자 주소: `https://<계정>.github.io/<리포명>/admin.html`
+3. 직원 공유 주소: `https://unionbioai-collab.github.io/email-signature/`
+4. 관리자 주소: `https://unionbioai-collab.github.io/email-signature/admin.html`
 
 ## 회사 공통값 변경 (관리자)
 admin.html 열기 → 값 수정 → "config.json 다운로드" →
