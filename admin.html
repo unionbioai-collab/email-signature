@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>UNION biometrics Signature Builder — Admin</title>
+<style>
+  :root{
+    --teal:#51afa2; --teal-deep:#2f9aa3; --green:#008143;
+    --ink:#15201e; --ink-soft:#5a6b68;
+    --bg:#eef4f3; --card:#ffffff; --line:#d7e4e2; --radius:14px;
+    --admin:#3a5a98;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",arial,sans-serif;
+    background:var(--bg); color:var(--ink); min-height:100vh;
+  }
+  header.app{
+    background:linear-gradient(120deg, #2c3e63, var(--admin) 60%, var(--teal-deep));
+    color:#fff; padding:26px 32px 22px;
+  }
+  header.app h1{margin:0;font-size:21px;letter-spacing:-0.3px;}
+  header.app h1 .badge{
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;
+    background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);
+    border-radius:999px;padding:3px 10px;vertical-align:3px;margin-left:8px;
+  }
+  header.app p{margin:6px 0 0;font-size:13px;opacity:.92;}
+  .wrap{
+    display:grid; grid-template-columns:minmax(360px, 460px) 1fr;
+    gap:24px; padding:24px 32px 48px; max-width:1400px; margin:0 auto;
+  }
+  @media (max-width: 1020px){ .wrap{grid-template-columns:1fr;padding:18px 14px 40px;} }
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;}
+  .panel h2{margin:0 0 14px;font-size:14px;letter-spacing:.4px;color:var(--admin);text-transform:uppercase;}
+  fieldset{border:none;margin:0 0 18px;padding:0 0 16px;border-bottom:1px dashed var(--line);}
+  fieldset:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+  legend{font-size:12px;font-weight:700;color:var(--ink-soft);padding:0;margin-bottom:10px;letter-spacing:.5px;}
+  .field{margin-bottom:10px;}
+  .field label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;}
+  .field label small{font-weight:400;color:var(--ink-soft);}
+  .field input{
+    width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;
+    font-size:13px;font-family:inherit;color:var(--ink);background:#fbfdfd;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .field input:focus{outline:none;border-color:var(--admin);box-shadow:0 0 0 3px rgba(58,90,152,.15);}
+  .check{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;line-height:1.5;}
+  .check input{width:auto;margin-top:2px;}
+  .preview-stage{
+    background:repeating-conic-gradient(#f3f7f6 0% 25%, #ffffff 0% 50%) 0 0/24px 24px;
+    border:1px solid var(--line);border-radius:10px;padding:20px;overflow:auto;
+  }
+  .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+  button{
+    font-family:inherit;font-size:13px;font-weight:700;border:none;border-radius:9px;
+    padding:11px 16px;cursor:pointer;transition:transform .08s, opacity .15s;
+  }
+  button:active{transform:translateY(1px);}
+  button:hover{opacity:.9;}
+  .btn-admin{background:var(--admin);color:#fff;}
+  .btn-ghost{background:#fff;color:var(--admin);border:1px solid var(--admin);}
+  .hint{font-size:12px;color:var(--ink-soft);margin-top:12px;line-height:1.7;}
+  .hint code{
+    background:#eef2f8;border:1px solid #d6dff0;border-radius:4px;
+    padding:1px 5px;font-size:11px;
+  }
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(8px);
+    background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;
+    font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  details.code{margin-top:16px;}
+  details.code summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--admin);}
+  textarea#jsonOut{
+    width:100%;height:240px;margin-top:10px;
+    font-family:Consolas,Menlo,monospace;font-size:11.5px;
+    border:1px solid var(--line);border-radius:8px;padding:10px;
+    color:var(--ink);background:#fbfdfd;resize:vertical;
+  }
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+
+<header class="app">
+  <h1>서명 생성기 설정 <span class="badge">ADMIN</span></h1>
+  <p>회사 공통값을 수정하고 config.json을 내려받아 리포지토리에 커밋하면 전 직원의 서명에 반영됩니다.</p>
+</header>
+
+<div class="wrap">
+
+  <section class="panel" aria-label="회사 공통값 설정">
+    <h2>회사 공통값</h2>
+    <form id="adminForm">
+      <fieldset>
+        <legend>회사 정보</legend>
+        <div class="field">
+          <label for="c_addrKo">주소 (A) — 국문</label>
+          <input id="c_addrKo" data-key="addrKo" />
+        </div>
+        <div class="field">
+          <label for="c_addrEn">주소 (A) — 영문</label>
+          <input id="c_addrEn" data-key="addrEn" />
+        </div>
+        <div class="field">
+          <label for="c_siteText">웹사이트 표시 텍스트</label>
+          <input id="c_siteText" data-key="siteText" />
+        </div>
+        <div class="field">
+          <label for="c_siteUrl">웹사이트 URL</label>
+          <input id="c_siteUrl" data-key="siteUrl" />
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>이미지</legend>
+        <div class="field">
+          <label for="c_logo">로고 이미지 URL</label>
+          <input id="c_logo" data-key="logo" />
+        </div>
+        <div class="field">
+          <label for="c_logoCaption">로고 하단 캡션 <small>(예: (구) 유니온커뮤니티 · 비우면 숨김)</small></label>
+          <input id="c_logoCaption" data-key="logoCaption" />
+        </div>
+        <div class="field">
+          <label for="c_bannerKo">하단 배너 URL — 국문 <small>(비우면 국문 선택지 무효)</small></label>
+          <input id="c_bannerKo" data-key="bannerKo" />
+        </div>
+        <div class="field">
+          <label for="c_bannerEn">하단 배너 URL — 영문 <small>(비우면 영문 선택지 무효)</small></label>
+          <input id="c_bannerEn" data-key="bannerEn" />
+        </div>
+        <div class="field">
+          <label for="c_homeIcon">홈페이지 아이콘 URL <small>(이메일/주소 사이 홈페이지 줄 아이콘)</small></label>
+          <input id="c_homeIcon" data-key="homeIcon" />
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>연락처 아이콘 <small style="font-weight:400;">— 비우면 아래 폴더 URL의 기본 아이콘, 그것도 없으면 T/M/E/A 텍스트</small></legend>
+        <div class="field"><label for="c_iconTel">유선전화 (T)</label><input id="c_iconTel" data-key="iconTel" /></div>
+        <div class="field"><label for="c_iconMobile">휴대전화 (M)</label><input id="c_iconMobile" data-key="iconMobile" /></div>
+        <div class="field"><label for="c_iconEmail">이메일 (E)</label><input id="c_iconEmail" data-key="iconEmail" /></div>
+        <div class="field"><label for="c_iconAddr">주소 (A)</label><input id="c_iconAddr" data-key="iconAddr" /></div>
+        <div class="field">
+          <label for="c_iconBase">기본 아이콘 폴더 URL <small>— <b>auto</b> = 배포 주소의 icons/ 폴더</small></label>
+          <input id="c_iconBase" data-key="iconBase" />
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>SNS 아이콘 이미지 <small style="font-weight:400;">— 비우면 기본 아이콘 사용</small></legend>
+        <div class="field"><label for="c_snsFbIcon">Facebook 아이콘</label><input id="c_snsFbIcon" data-key="snsFbIcon" /></div>
+        <div class="field"><label for="c_snsYtIcon">YouTube 아이콘</label><input id="c_snsYtIcon" data-key="snsYtIcon" /></div>
+        <div class="field"><label for="c_snsLnIcon">LinkedIn 아이콘</label><input id="c_snsLnIcon" data-key="snsLnIcon" /></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>SNS 링크 <small style="font-weight:400;">— 비우면 해당 아이콘 숨김</small></legend>
+        <div class="field"><label for="c_fb">Facebook</label><input id="c_fb" data-key="fb" /></div>
+        <div class="field"><label for="c_yt">YouTube</label><input id="c_yt" data-key="yt" /></div>
+        <div class="field"><label for="c_ln">LinkedIn</label><input id="c_ln" data-key="ln" /></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>사용자 페이지 동작</legend>
+        <label class="check">
+          <input type="checkbox" id="c_lock" checked />
+          <span>사용자 페이지에서 회사 항목 잠금 (직원은 이름·부서·연락처만 입력)</span>
+        </label>
+      </fieldset>
+    </form>
+  </section>
+
+  <section class="panel" aria-label="미리보기 및 내보내기">
+    <h2>미리보기 <small style="font-weight:400;color:var(--ink-soft);">— 예시 인물 적용</small></h2>
+    <div class="preview-stage">
+      <div id="preview"></div>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn-admin" id="btnDownloadJson">config.json 다운로드</button>
+      <button type="button" class="btn-ghost" id="btnCopyJson">JSON 복사</button>
+    </div>
+
+    <p class="hint">
+      <b>반영 절차</b> — ① 위 값 수정 → ② <b>config.json 다운로드</b> →
+      ③ 리포지토리 루트의 <code>config.json</code>을 교체해 커밋/푸시 →
+      ④ 1~2분 내 GitHub Pages에 반영되어 모든 직원의 서명 페이지에 적용됩니다.
+      별도 서버 없이 파일 하나로 전사 설정이 관리되는 구조입니다.
+    </p>
+
+    <details class="code" open>
+      <summary>config.json 내용</summary>
+      <textarea id="jsonOut" readonly spellcheck="false"></textarea>
+    </details>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="sig-core.js"></script>
+<script>
+(function(){
+  "use strict";
+  var SAMPLE = { name:"홍길동", nameEn:"Gildong Hong", dept:"전략기획본부 / 마케팅팀", title:"팀장", tel:"82 2-6488-3235", mobile:"82 10-0000-0000", email:"hong@unionbiometrics.com", banner:"ko", addrLang:"ko" };
+  var preview = document.getElementById("preview");
+  var jsonOut = document.getElementById("jsonOut");
+
+  function readConfig(){
+    var c = {};
+    document.querySelectorAll("#adminForm [data-key]").forEach(function(el){
+      c[el.dataset.key] = el.value.trim();
+    });
+    c.lockCompanyFields = document.getElementById("c_lock").checked;
+    return c;
+  }
+  function fillForm(c){
+    document.querySelectorAll("#adminForm [data-key]").forEach(function(el){
+      el.value = c[el.dataset.key] != null ? c[el.dataset.key] : "";
+    });
+    document.getElementById("c_lock").checked = c.lockCompanyFields !== false;
+  }
+  function render(){
+    var c = readConfig();
+    preview.innerHTML = SigCore.buildSignature(SAMPLE, c);
+    jsonOut.value = JSON.stringify(c, null, 2);
+  }
+
+  document.getElementById("adminForm").addEventListener("input", render);
+  document.getElementById("c_lock").addEventListener("change", render);
+
+  /* 현재 배포된 config.json을 불러와 폼에 채움 (없으면 기본값) */
+  SigCore.loadConfig().then(function(c){ fillForm(c); render(); });
+  fillForm(SigCore.DEFAULT_CONFIG); render();
+
+  var toast = document.getElementById("toast"), toastTimer;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove("show"); }, 2400);
+  }
+
+  document.getElementById("btnDownloadJson").addEventListener("click", function(){
+    var blob = new Blob([jsonOut.value + "\n"], {type:"application/json;charset=utf-8"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "config.json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    showToast("config.json 다운로드 — 리포지토리 루트에 커밋하면 반영됩니다.");
+  });
+
+  document.getElementById("btnCopyJson").addEventListener("click", function(){
+    navigator.clipboard.writeText(jsonOut.value).then(function(){
+      showToast("JSON이 복사되었습니다.");
+    }, function(){
+      jsonOut.select(); document.execCommand("copy");
+      showToast("JSON이 복사되었습니다.");
+    });
+  });
+})();
+</script>
+</body>
+</html>
