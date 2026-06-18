@@ -63,9 +63,7 @@
     var rows = "";
     if (v.tel)    rows += contactRow(c.iconTel, ib, "tel", "T", plain(v.tel));
     if (v.mobile) rows += contactRow(c.iconMobile, ib, "mobile", "M", plain(v.mobile));
-    if (v.email)  rows += contactRow(c.iconEmail, ib, "email", "E",
-      '<a href="mailto:' + esc(v.email) + '" style="text-decoration:none;font-size:9pt;line-height:10pt;color:' + C_TEXT + ';">'
-      + '<span style="text-decoration:none;font-size:9pt;line-height:10pt;color:' + C_TEXT + ';font-family:굴림체;">' + esc(v.email) + '</span></a>');
+    if (v.email)  rows += contactRow(c.iconEmail, ib, "email", "E", plain(v.email));
     if (c.siteText) rows += contactRow(c.homeIcon, ib, "home", "H",
       '<a href="' + esc(c.siteUrl || ("https://" + c.siteText)) + '" target="_blank" rel="noopener" style="text-decoration:none;font-size:9pt;line-height:10pt;color:' + C_TEXT + ';">'
       + '<span style="text-decoration:none;font-size:9pt;line-height:10pt;color:' + C_TEXT + ';font-family:굴림체;">' + esc(c.siteText) + '</span></a>');
@@ -101,28 +99,28 @@
       logoCell =
         '<p style="text-align:center;font-size:10pt;font-family:arial,sans-serif;line-height:1.2;margin:0px;">'
         + '<a href="' + esc(c.siteUrl || "#") + '" target="_blank">'
-        + '<img border="0" alt="Logo" src="' + esc(c.logo) + '" style="width:110px;border:0;" /></a></p>';
+        + '<img border="0" alt="Logo" src="' + esc(c.logo) + '" width="110" style="width:110px;max-width:110px;height:auto;display:block;margin:0 auto;border:0;" /></a></p>';
       if (c.logoCaption) logoCell +=
         '<p style="text-align:center;font-size:10pt;font-family:arial,sans-serif;line-height:1.2;margin:6px 0px 0px;">'
         + '<span style="font-family:\'맑은 고딕\',sans-serif;font-size:9pt;color:#858585;font-weight:bold;">' + esc(c.logoCaption) + '</span></p>';
     }
 
     var html =
-'<table cellspacing="0" cellpadding="0" border="0" style="font-family:arial,sans-serif;color:rgb(0,0,0);max-width:728px;margin-left:0px;margin-right:auto;width:599px;overflow-wrap:break-word;word-break:normal;">\n'
-+ '<colgroup><col style="width:130px;" /><col style="width:469px;" /></colgroup>\n'
+'<table cellspacing="0" cellpadding="0" border="0" width="599" style="font-family:arial,sans-serif;color:rgb(0,0,0);width:599px;max-width:599px;table-layout:fixed;overflow-wrap:break-word;word-break:normal;border-collapse:collapse;">\n'
++ '<colgroup><col width="130" style="width:130px;" /><col width="469" style="width:469px;" /></colgroup>\n'
 + '<tbody>\n'
 + '<tr>\n'
-+ '  <td colspan="2" style="margin:0px;padding:0px 0px 4px;border-bottom:1px solid ' + C_LINE + ';width:599px;height:45px;">\n'
++ '  <td colspan="2" width="599" style="margin:0px;padding:0px 0px 4px;border-bottom:1px solid ' + C_LINE + ';width:599px;height:45px;">\n'
 + '    <p style="margin:0px;padding:0px;color:#101010;font-size:10pt;font-family:arial,sans-serif;line-height:1.2;">'
 +      '<span style="font-weight:700;font-size:18pt;font-family:arial,sans-serif;color:#101010;">' + fullName + '</span><br />'
 +      '<span style="font-family:굴림체;font-size:10pt;color:' + C_DEPT + ';">' + esc(v.dept) + '</span>' + titlePart + '</p>\n'
 + '  </td>\n'
 + '</tr>\n'
 + '<tr>\n'
-+ '  <td style="margin:0px;padding:0px;width:130px;height:105px;vertical-align:middle;">\n'
++ '  <td width="130" style="margin:0px;padding:0px;width:130px;max-width:130px;height:105px;vertical-align:middle;">\n'
 +      logoCell + '\n'
 + '  </td>\n'
-+ '  <td style="margin:0px;padding:25px 0px 0px;width:469px;height:102px;vertical-align:top;">\n'
++ '  <td width="469" style="margin:0px;padding:25px 0px 0px;width:469px;max-width:469px;height:102px;vertical-align:top;">\n'
 +      rows + sns + '\n'
 + '  </td>\n'
 + '</tr>\n'
